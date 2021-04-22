@@ -18,9 +18,6 @@ contract PoolPortal is Ownable{
 
   uint public version = 4;
 
-  // CoTrader platform recognize ETH by this address
-  IERC20 constant private ETH_TOKEN_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-
   IUniswapV2Router public uniswapV2Router;
 
   // Enum
@@ -141,7 +138,7 @@ contract PoolPortal is Ownable{
 
     // Buy UNI V2 pool
     // ETH connector case
-    if(_connectorsAddress[0] == address(ETH_TOKEN_ADDRESS)){
+    if(_connectorsAddress[0] == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       uniswapV2Router.addLiquidityETH.value(_connectorsAmount[0])(
        _connectorsAddress[1],
        _connectorsAmount[1],
@@ -183,7 +180,7 @@ contract PoolPortal is Ownable{
   {
     // approve from portal to spender
     for(uint8 i = 0; i < connectorsAddress.length; i++){
-      if(connectorsAddress[i] != address(ETH_TOKEN_ADDRESS)){
+      if(connectorsAddress[i] != address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
         // transfer from msg.sender and approve to
         _transferFromSenderAndApproveTo(
           IERC20(connectorsAddress[i]),
@@ -213,7 +210,7 @@ contract PoolPortal is Ownable{
     uint256 remains = 0;
     for(uint8 i = 0; i < connectorsAddress.length; i++){
       // ERC20 case
-      if(connectorsAddress[i] != address(ETH_TOKEN_ADDRESS)){
+      if(connectorsAddress[i] != address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
         // check balance
         remains = IERC20(connectorsAddress[i]).balanceOf(address(this));
         // transfer ERC20
@@ -299,7 +296,7 @@ contract PoolPortal is Ownable{
     uint256 deadline = now + 15 minutes;
 
     // sell pool with include eth connector
-    if(connectorsAddress[0] == address(ETH_TOKEN_ADDRESS)){
+    if(connectorsAddress[0] == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       uniswapV2Router.removeLiquidityETH(
           connectorsAddress[1],
           _amount,
@@ -339,7 +336,7 @@ contract PoolPortal is Ownable{
     // transfer connectors back to fund
     for(uint8 i = 0; i < connectorsAddress.length; i++){
       // ETH case
-      if(connectorsAddress[i] == address(ETH_TOKEN_ADDRESS)){
+      if(connectorsAddress[i] == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
         // update ETH data
         received = address(this).balance;
         connectorsAmount[i] = received;
