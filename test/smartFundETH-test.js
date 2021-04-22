@@ -243,8 +243,8 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
 
     })
 
-    it('Correct version 7', async function() {
-      assert.equal(await smartFundETH.version(), 7)
+    it('Correct version 9', async function() {
+      assert.equal(await smartFundETH.version(), 9)
     })
 
     it('Correct size type', async function() {
@@ -823,7 +823,7 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
       await exchangePortal.setRatio(1, 100000000)
 
       await smartFundETH.calculateFundManagerCut()
-      // take cut 
+      // take cut
       await smartFundETH.fundManagerWithdraw({ from: userOne })
       await smartFundETH.calculateFundManagerCut()
 
