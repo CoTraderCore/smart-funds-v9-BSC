@@ -44,9 +44,6 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
   // because order has dependency in other contracts like ConvertPortal
   enum ExchangeType { OneInchRoute }
 
-  // This contract recognizes ETH by this address
-  IERC20 constant private ETH_TOKEN_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-
   // Trade event
   event Trade(
      address trader,
@@ -134,7 +131,7 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
     require(_source != _destination, "source can not be destination");
 
     // check ETH payable case
-    if (_source == ETH_TOKEN_ADDRESS) {
+    if (_source == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
       require(msg.value == _sourceAmount);
     } else {
       require(msg.value == 0);
@@ -158,7 +155,7 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
     require(receivedAmount > 0, "received amount can not be zerro");
 
     // Send destination
-    if (_destination == ETH_TOKEN_ADDRESS) {
+    if (_destination == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
       (msg.sender).transfer(receivedAmount);
     } else {
       // transfer tokens received to sender
@@ -192,7 +189,7 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
   {
      bool success;
      // from ETH
-     if(IERC20(sourceToken) == ETH_TOKEN_ADDRESS) {
+     if(IERC20(sourceToken) == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
        (success, ) = OneInchRoute.call.value(sourceAmount)(
          _additionalData
        );
@@ -215,13 +212,13 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
   // Facilitates for send source remains
   function _sendRemains(IERC20 _source, address _receiver) private {
     // After the trade, any _source that exchangePortal holds will be sent back to msg.sender
-    uint256 endAmount = (_source == ETH_TOKEN_ADDRESS)
+    uint256 endAmount = (_source == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE))
     ? address(this).balance
     : _source.balanceOf(address(this));
 
     // Check if we hold a positive amount of _source
     if (endAmount > 0) {
-      if (_source == ETH_TOKEN_ADDRESS) {
+      if (_source == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
         payable(_receiver).transfer(endAmount);
       } else {
         _source.transfer(_receiver, endAmount);
@@ -265,7 +262,7 @@ contract ExchangePortal is ExchangePortalInterface, Ownable {
   // VIEW Functions
 
   function tokenBalance(IERC20 _token) private view returns (uint256) {
-    if (_token == ETH_TOKEN_ADDRESS)
+    if (_token == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE))
       return address(this).balance;
     return _token.balanceOf(address(this));
   }
