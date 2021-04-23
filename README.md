@@ -8,12 +8,12 @@ NOTE: in separate console
 2) truffle test
 ```
 
-# TODO
-
+# Updates
 ```
-Add tests
-
-1) Manager can do new take cut if new profit and new profit less than previos
+1) Add roles swaper.
+2) Fix manager take cut for case manager take cut when profit go up then down.
+3) Optimize gas (remove or cache global vars in functions).
+4) Fund creator can change fund name.
 ```
 
 
@@ -79,49 +79,8 @@ Tokens Type storage
 
 0x666CAe17452Cf2112eF1479943099320AFD16d47
 
-
-Defi Portal (NOT IMPLEMENTED)
-
-0x6d85Dd4672AFad01a28bdfA8b4323bE910999954
-
-
-Old Price Portal
-
-0x9c990064EC31a531752adD55283B560Fb191dE2B
-
-
-New Price Portal
+Price Portal
 
 0x0D038FB3b78AEB931AC0A8d890F9E5A12A2b96B3
-
-Pool Portal
-
-0x2b4ba0A92CcC11E839d1928ae73b34E7aaC2C040
-
-
-Exchange Portal (OLD)
-
-0xC8A2Ba3E9CE03f78551d7dE5706Cc275d4D3130f
-
-
-Exchange Portal (NEW)
-
-0x5d1A6508433067191002c0655D9f2Dcf62768224
-
-
-Smart Fund ETH Factory
-
-0x3aE392A4c6a99FcB991E208f9D74618fff513834
-
-
-Smart Fund ERC20 Factory
-
-0x6F553184C04a4aD0b3551A4ff60FB73BB6E90408
-
-
-Smart funds registry
-
-0x3e3C06d526b38F67D7a897Bba20906f36D2793A3
-
 
 ```

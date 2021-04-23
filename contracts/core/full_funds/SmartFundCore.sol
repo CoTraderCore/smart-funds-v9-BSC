@@ -109,6 +109,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   // total `depositToken` deposited - total `depositToken` withdrawn
   mapping (address => int256) public addressesNetDeposit;
 
+  // owner can add/remove swapper
+  mapping (address => bool) public swappers;
+
   // Events
   event DefiCall(
     string eventType,
@@ -186,6 +189,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     // Initial check if fund require trade verification or not
     isRequireTradeVerification = _isRequireTradeVerification;
 
+    // Init owner as swapper
+    swappers[msg.sender] = true;
+
     emit SmartFundCreated(owner());
   }
 
@@ -194,6 +200,11 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   function calculateFundValue() public virtual view returns (uint256);
   function getTokenValue(IERC20 _token) public virtual view returns (uint256);
 
+  // role which allow call trade, buy/sell pool, call defi
+  modifier onlySwapper () {
+  require(swappers[msg.sender], "Not swapper");
+  _;
+  }
 
   /**
   * @dev Sends (_mul/_div) of every token (and ether) the funds holds to _withdrawAddress
@@ -311,7 +322,10 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     uint256[] calldata _positions,
     bytes calldata _additionalData,
     uint256 _minReturn
-  ) external onlyOwner {
+  )
+    external
+    onlySwapper
+  {
     require(_minReturn > 0, "MIN_RETURN_0");
 
     uint256 receivedAmount;
@@ -379,7 +393,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
    bytes32[] calldata _additionalArgs,
    bytes calldata     _additionData
   )
-  external onlyOwner {
+    external
+    onlySwapper
+  {
    // for determine the exact number of received pool
    uint256 poolAmountReceive;
 
@@ -451,7 +467,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     bytes32[] calldata _additionalArgs,
     bytes calldata _additionData
   )
-  external onlyOwner {
+    external
+    onlySwapper
+  {
     // approve pool
     _poolToken.approve(address(poolPortal), _amount);
 
@@ -495,7 +513,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     bytes calldata _additionalData
   )
     external
-    onlyOwner
+    onlySwapper
   {
     // event data
     string memory eventType;
@@ -767,7 +785,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   *
   * @param _newExchangePortalAddress    The address of the new permitted exchange portal to use
   */
-  function setNewExchangePortal(address _newExchangePortalAddress) public onlyOwner {
+  function setNewExchangePortal(address _newExchangePortalAddress) external onlyOwner {
     // Require correct permitted address type
     require(permittedAddresses.isMatchTypes(_newExchangePortalAddress, 1), "WRONG_ADDRESS");
     // Set new
@@ -779,7 +797,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   *
   * @param _newPoolPortal   The address of the new permitted pool portal to use
   */
-  function setNewPoolPortal(address _newPoolPortal) public onlyOwner {
+  function setNewPoolPortal(address _newPoolPortal) external onlyOwner {
     // Require correct permitted address type
     require(permittedAddresses.isMatchTypes(_newPoolPortal, 2), "WRONG_ADDRESS");
     // Set new
@@ -792,11 +810,21 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   *
   * @param _newDefiPortalAddress    The address of the new permitted defi portal to use
   */
-  function setNewDefiPortal(address _newDefiPortalAddress) public onlyOwner {
+  function setNewDefiPortal(address _newDefiPortalAddress) external onlyOwner {
     // Require correct permitted address type
     require(permittedAddresses.isMatchTypes(_newDefiPortalAddress, 3), "WRONG_ADDRESS");
     // Set new
     defiPortal = DefiPortalInterface(_newDefiPortalAddress);
+  }
+
+  /**
+  * @dev Allow owner add/remove swapper
+  *
+  * @param _swapper      address of swapper
+  * @param _status       true - add, false - remove
+  */
+  function updateSwapperStatus(address _swapper, bool _status) external onlyOwner {
+    swappers[_swapper] = _status;
   }
 
   /**
