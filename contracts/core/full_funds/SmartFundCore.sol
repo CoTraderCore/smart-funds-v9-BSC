@@ -138,6 +138,11 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   event Trade(address src, uint256 srcAmount, address dest, uint256 destReceived);
   event SmartFundCreated(address indexed owner);
 
+  // modifier role which allow call trade, buy/sell pool, call defi
+  modifier onlySwapper () {
+  require(swappers[msg.sender], "Not swapper");
+  _;
+  }
 
   constructor(
     address _owner,
@@ -199,12 +204,6 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   // USD and ETH based funds have different implements of this methods
   function calculateFundValue() public virtual view returns (uint256);
   function getTokenValue(IERC20 _token) public virtual view returns (uint256);
-
-  // role which allow call trade, buy/sell pool, call defi
-  modifier onlySwapper () {
-  require(swappers[msg.sender], "Not swapper");
-  _;
-  }
 
   /**
   * @dev Sends (_mul/_div) of every token (and ether) the funds holds to _withdrawAddress
