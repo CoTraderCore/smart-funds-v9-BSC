@@ -91,18 +91,21 @@ contract SmartFundETH is SmartFundCore {
   function calculateFundValue() public override view returns (uint256) {
     uint256 ethBalance = address(this).balance;
 
+    // cache global var for save gas
+    uint256 tokenAddressesLength = tokenAddresses.length;
+
     // If the fund only contains ether, return the funds ether balance
-    if (tokenAddresses.length == 1)
+    if (tokenAddressesLength == 1)
       return ethBalance;
 
     // Otherwise, we get the value of all the other tokens in ether via exchangePortal
 
     // Calculate value for ERC20
-    address[] memory fromAddresses = new address[](tokenAddresses.length - 1); // Sub ETH
-    uint256[] memory amounts = new uint256[](tokenAddresses.length - 1);
+    address[] memory fromAddresses = new address[](tokenAddressesLength - 1); // Sub ETH
+    uint256[] memory amounts = new uint256[](tokenAddressesLength - 1);
     uint index = 0;
 
-    for (uint256 i = 1; i < tokenAddresses.length; i++) {
+    for (uint256 i = 1; i < tokenAddressesLength; i++) {
       fromAddresses[index] = tokenAddresses[i];
       amounts[index] = IERC20(tokenAddresses[i]).balanceOf(address(this));
       index++;

@@ -224,7 +224,10 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     internal
     returns (uint256)
   {
-    for (uint8 i = 1; i < tokenAddresses.length; i++) {
+    // cache global var for safe gas
+    uint256 tokenAddressesLength = tokenAddresses.length;
+
+    for (uint8 i = 1; i < tokenAddressesLength; i++) {
       // Transfer that _mul/_div of each token we hold to the user
       IERC20 token = IERC20(tokenAddresses[i]);
       uint256 fundAmount = token.balanceOf(address(this));

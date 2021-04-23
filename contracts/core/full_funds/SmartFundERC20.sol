@@ -113,19 +113,22 @@ contract SmartFundERC20 is SmartFundCore {
       address(this).balance
     );
 
+    // cache global var for save gas
+    uint256 tokenAddressesLength = tokenAddresses.length;
+
     // If the fund only contains ether, return the funds ether balance converted in core ERC20
-    if (tokenAddresses.length == 1)
+    if (tokenAddressesLength == 1)
       return ethBalance;
 
     // Otherwise, we get the value of all the other tokens in ether via exchangePortal
 
     // Calculate value for ERC20
-    address[] memory fromAddresses = new address[](tokenAddresses.length - 2); // sub ETH + curernt core ERC20
-    uint256[] memory amounts = new uint256[](tokenAddresses.length - 2);
+    address[] memory fromAddresses = new address[](tokenAddressesLength - 2); // sub ETH + curernt core ERC20
+    uint256[] memory amounts = new uint256[](tokenAddressesLength - 2);
     uint8 index = 0;
 
     // get all ERC20 addresses and balance
-    for (uint8 i = 2; i < tokenAddresses.length; i++) {
+    for (uint8 i = 2; i < tokenAddressesLength; i++) {
       fromAddresses[index] = tokenAddresses[i];
       amounts[index] = IERC20(tokenAddresses[i]).balanceOf(address(this));
       index++;
