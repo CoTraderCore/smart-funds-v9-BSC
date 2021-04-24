@@ -8,6 +8,13 @@ NOTE: in separate console
 2) truffle test
 ```
 
+# TODO
+
+```
+1) Add more stabels in permitted
+2) Create new form for create v9 funds 
+```
+
 # Updates
 ```
 1) Add roles swaper.
