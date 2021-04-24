@@ -43,13 +43,13 @@ const SmartFundERC20 = artifacts.require('./core/full_funds/SmartFundERC20.sol')
 const TokensTypeStorage = artifacts.require('./core/storage/TokensTypeStorage.sol')
 const PermittedAddresses = artifacts.require('./core/verification/PermittedAddresses.sol')
 const MerkleWhiteList = artifacts.require('./core/verification/MerkleTreeTokensVerification.sol')
-const DefiPortal = artifacts.require('./core/portals/DefiPortal.sol')
 
 // mock contracts
 const YVault = artifacts.require('./tokens/YVaultMock.sol')
 const Token = artifacts.require('./tokens/Token')
 const ExchangePortalMock = artifacts.require('./portalsMock/ExchangePortalMock')
 const PoolPortalMock = artifacts.require('./portalsMock/PoolPortalMock')
+const DefiPortal = artifacts.require('./portalsMock/DefiPortalMock.sol')
 const CoTraderDAOWalletMock = artifacts.require('./CoTraderDAOWalletMock')
 const OneInch = artifacts.require('./OneInchMock')
 

@@ -40,13 +40,13 @@ const SmartFundETH = artifacts.require('./core/full_funds/SmartFundETH.sol')
 const TokensTypeStorage = artifacts.require('./core/storage/TokensTypeStorage.sol')
 const PermittedAddresses = artifacts.require('./core/verification/PermittedAddresses.sol')
 const MerkleWhiteList = artifacts.require('./core/verification/MerkleTreeTokensVerification.sol')
-const DefiPortal = artifacts.require('./core/portals/DefiPortal.sol')
 
 // mock
 const YVault = artifacts.require('./tokens/YVaultMock.sol')
 const Token = artifacts.require('./tokens/Token')
 const ExchangePortalMock = artifacts.require('./portalsMock/ExchangePortalMock')
 const PoolPortalMock = artifacts.require('./portalsMock/PoolPortalMock')
+const DefiPortal = artifacts.require('./portalsMock/DefiPortalMock.sol')
 const CoTraderDAOWalletMock = artifacts.require('./CoTraderDAOWalletMock')
 const OneInch = artifacts.require('./OneInchMock')
 
@@ -797,12 +797,105 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
       assert.equal(await ETHBNT.balanceOf(smartFundETH.address), 0)
     })
 
-    it('Swapper can call defi ', async function() {
-      // deploy smartFund with 10% success fee
-      await deployContracts(1000)
-      // add swapper
-      await smartFundETH.updateSwapperStatus(userTwo, true)
+    it('NOT swapper should NOT be able call defi portal', async function() {
+     // deploy smartFund with 10% success fee
+     await deployContracts(1000)
+     // send some assets to pool portal
+     await DAI.transfer(exchangePortal.address, toWei(String(1)))
+     await smartFundETH.deposit({ from: userOne, value: toWei(String(1)) })
 
+     // get proof and position for dest token
+     const proofDAI = MerkleTREE.getProof(keccak256(DAI.address)).map(x => buf2hex(x.data))
+     const positionDAI = MerkleTREE.getProof(keccak256(DAI.address)).map(x => x.position === 'right' ? 1 : 0)
+
+     // get 1 DAI from exchange portal
+     await smartFundETH.trade(
+       ETH_TOKEN_ADDRESS,
+       toWei(String(1)),
+       DAI.address,
+       0,
+       proofDAI,
+       positionDAI,
+       PARASWAP_MOCK_ADDITIONAL_PARAMS,
+       1,
+       {
+         from: userOne,
+       }
+     )
+
+     // Check balance before buy yDAI
+     assert.equal(await DAI.balanceOf(smartFundETH.address), toWei(String(1)))
+     assert.equal(await yDAI.balanceOf(smartFundETH.address), 0)
+
+     const tokenAddressBefore = await smartFundETH.getAllTokenAddresses()
+
+     // BUY yDAI
+     await smartFundETH.callDefiPortal(
+       [DAI.address],
+       [toWei(String(1))],
+       ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+       web3.eth.abi.encodeParameters(
+        ['address', 'uint256'],
+        [yDAI.address, toWei(String(1))]
+      ),
+      { from:userTwo }
+     ).should.be.rejectedWith(EVMRevert)
+   })
+
+   it('New swapper should be able call defi portal', async function() {
+    // deploy smartFund with 10% success fee
+    await deployContracts(1000)
+    // add new swapper
+    await smartFundETH.updateSwapperStatus(userTwo, true)
+    // send some assets to pool portal
+    await DAI.transfer(exchangePortal.address, toWei(String(1)))
+    await smartFundETH.deposit({ from: userOne, value: toWei(String(1)) })
+
+    // get proof and position for dest token
+    const proofDAI = MerkleTREE.getProof(keccak256(DAI.address)).map(x => buf2hex(x.data))
+    const positionDAI = MerkleTREE.getProof(keccak256(DAI.address)).map(x => x.position === 'right' ? 1 : 0)
+
+    // get 1 DAI from exchange portal
+    await smartFundETH.trade(
+      ETH_TOKEN_ADDRESS,
+      toWei(String(1)),
+      DAI.address,
+      0,
+      proofDAI,
+      positionDAI,
+      PARASWAP_MOCK_ADDITIONAL_PARAMS,
+      1,
+      {
+        from: userOne,
+      }
+    )
+
+    // Check balance before buy yDAI
+    assert.equal(await DAI.balanceOf(smartFundETH.address), toWei(String(1)))
+    assert.equal(await yDAI.balanceOf(smartFundETH.address), 0)
+
+    const tokenAddressBefore = await smartFundETH.getAllTokenAddresses()
+
+    // BUY yDAI
+    await smartFundETH.callDefiPortal(
+      [DAI.address],
+      [toWei(String(1))],
+      ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      web3.eth.abi.encodeParameters(
+       ['address', 'uint256'],
+       [yDAI.address, toWei(String(1))]
+     ),
+     { from:userTwo }
+    ).should.be.fulfilled
+
+    const tokenAddressAfter = await smartFundETH.getAllTokenAddresses()
+
+    // yDAI shoul be added in fund
+    assert.isTrue(tokenAddressAfter.length > tokenAddressBefore.length)
+
+    // Check balance after buy yDAI
+    assert.equal(fromWei(await DAI.balanceOf(smartFundETH.address)), 0)
+    assert.equal(await yDAI.balanceOf(smartFundETH.address), toWei(String(1)))
     })
 
     it('Removed swapper can not trade ', async function() {
