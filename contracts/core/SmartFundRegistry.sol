@@ -26,18 +26,11 @@ contract SmartFundRegistry is Ownable {
   // Default maximum success fee is 3000/30%
   uint256 public maximumSuccessFee = 3000;
 
-  // Address of stable coin can be set in constructor and changed via function
-  address public stableCoinAddress;
-
   // Factories
   SmartFundETHFactoryInterface public smartFundETHFactory;
   SmartFundERC20FactoryInterface public smartFundERC20Factory;
 
   address public platformFeeAddress = address(this);
-
-  // Enum for detect fund type in create fund function
-  // NOTE: You can add a new type at the end, but do not change this order
-  enum FundType { ETH, USD }
 
   event SmartFundAdded(address indexed smartFundAddress, address indexed owner);
 
@@ -46,7 +39,6 @@ contract SmartFundRegistry is Ownable {
   *
   * @param _exchangePortalAddress        Address of the initial ExchangePortal contract
   * @param _poolPortalAddress            Address of the initial PoolPortal contract
-  * @param _stableCoinAddress            Address of the stable coin
   * @param _smartFundETHFactory          Address of smartFund ETH factory
   * @param _smartFundERC20Factory        Address of smartFund USD factory
   * @param _defiPortalAddress            Address of defiPortal contract
@@ -55,7 +47,6 @@ contract SmartFundRegistry is Ownable {
   constructor(
     address _exchangePortalAddress,
     address _poolPortalAddress,
-    address _stableCoinAddress,
     address _smartFundETHFactory,
     address _smartFundERC20Factory,
     address _defiPortalAddress,
@@ -63,7 +54,6 @@ contract SmartFundRegistry is Ownable {
   ) public {
     exchangePortalAddress = _exchangePortalAddress;
     poolPortalAddress = _poolPortalAddress;
-    stableCoinAddress = _stableCoinAddress;
     smartFundETHFactory = SmartFundETHFactoryInterface(_smartFundETHFactory);
     smartFundERC20Factory = SmartFundERC20FactoryInterface(_smartFundERC20Factory);
     defiPortalAddress = _defiPortalAddress;
@@ -75,23 +65,23 @@ contract SmartFundRegistry is Ownable {
   *
   * @param _name                        The name of the new fund
   * @param _successFee                  The fund managers success fee
-  * @param _fundType                    Fund type enum number
+  * @param _coreAsset                   Fund core asset
   * @param _isRequireTradeVerification  If true fund can buy only tokens,
   *                                     which include in Merkle Three white list
   */
   function createSmartFund(
     string memory _name,
     uint256       _successFee,
-    uint256       _fundType,
+    address       _coreAsset,
     bool          _isRequireTradeVerification
   ) public {
     // Require that the funds success fee be less than the maximum allowed amount
-    require(_successFee <= maximumSuccessFee);
+    require(_successFee <= maximumSuccessFee, "Too big fee");
 
     address smartFund;
 
     // ETH case
-    if(_fundType == uint256(FundType.ETH)){
+    if(_coreAsset == address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)){
       // Create ETH Fund
       smartFund = smartFundETHFactory.createSmartFund(
         msg.sender,
@@ -118,7 +108,7 @@ contract SmartFundRegistry is Ownable {
         poolPortalAddress,
         defiPortalAddress,
         address(permittedAddresses),
-        stableCoinAddress,
+        _coreAsset,
         _isRequireTradeVerification
       );
     }
@@ -184,16 +174,6 @@ contract SmartFundRegistry is Ownable {
   */
   function setMaximumSuccessFee(uint256 _maximumSuccessFee) external onlyOwner {
     maximumSuccessFee = _maximumSuccessFee;
-  }
-
-  /**
-  * @dev Owner can set new stableCoinAddress
-  *
-  * @param _stableCoinAddress    New stable address
-  */
-  function setStableCoinAddress(address _stableCoinAddress) external onlyOwner {
-    require(permittedAddresses.permittedAddresses(_stableCoinAddress));
-    stableCoinAddress = _stableCoinAddress;
   }
 
 

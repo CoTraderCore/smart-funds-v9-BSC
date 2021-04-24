@@ -14,6 +14,7 @@ NOTE: in separate console
 2) Fix manager take cut for case manager take cut when profit go up then down.
 3) Optimize gas (remove or cache global vars in functions).
 4) Fund creator can change fund name.
+5) Add any fund asset type.
 ```
 
 
