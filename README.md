@@ -8,12 +8,6 @@ NOTE: in separate console
 2) truffle test
 ```
 
-# TODO
-
-```
-1) Add more stables in permitted
-2) Create new form for create v9 funds
-```
 
 # Updates
 ```
@@ -120,5 +114,10 @@ SmartFundERC20Factory
 SmartFundRegistry
 
 0x759563F3A0f51A202e504BE5Ea3DeF0D3b4e6933
+
+
+MockExchangePortalPrice
+
+0xe81F3fF8c7D6F2E3f19A7872fD32D5EAC5491C91
 
 ```
