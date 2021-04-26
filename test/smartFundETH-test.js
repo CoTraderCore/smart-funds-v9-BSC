@@ -1607,6 +1607,8 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
 
   describe('Platform cut', function() {
     it('Platform can get 10% from ETH profit', async function() {
+      // fund should not have any balance
+      assert.equal(fromWei(await web3.eth.getBalance(COT_DAO_WALLET)), 0)
       // deploy smartFund with 10% success fee and platform fee
       await deployContracts(1000)
       // give exchange portal contract some money
