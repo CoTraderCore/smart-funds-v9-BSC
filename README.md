@@ -17,9 +17,9 @@ NOTE: in separate console
 
 # Updates
 ```
-1) Add roles swaper.
-2) Fix manager take cut for case manager take cut when profit go up then down.
-3) Optimize gas (remove or cache global vars in functions).
+1) Add role swaper which can trade, pool and call defi protocols.
+2) Fix manager take cut for case manager take cut on the best profit period when profit go up then go down.
+3) Optimize gas (remove or cache global vars in functions), for funds with 5-10 and more tokens gas now in n x less.
 4) Fund creator can change fund name.
 5) Add any fund asset type.
 ```

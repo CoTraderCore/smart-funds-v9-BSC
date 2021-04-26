@@ -201,7 +201,7 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
       userOne,                                      // address _owner,
       'TEST ETH FUND',                              // string _name,
       successFee,                                   // uint256 _successFee,
-      COT_DAO_WALLET,                       // address _platformAddress,
+      COT_DAO_WALLET,                               // address _platformAddress,
       exchangePortal.address,                       // address _exchangePortalAddress,
       poolPortal.address,                           // address _poolPortalAddress,
       defiPortal.address,
@@ -305,6 +305,19 @@ contract('SmartFundETH', function([userOne, userTwo, userThree]) {
       assert.equal(Number(successFee), 1000)
       assert.equal(Number(platformFee), 1000)
       assert.equal(Number(successFee), Number(platformFee))
+    })
+  })
+
+  describe('Update fund name', function() {
+    it('Not owner can not update fund name', async function() {
+      await smartFundETH.updateFundName('NEW NAME FOR ETH FUND', { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can update fund name', async function() {
+      assert.equal(await smartFundETH.name(), 'TEST ETH FUND')
+      await smartFundETH.updateFundName('NEW NAME FOR ETH FUND')
+      assert.equal(await smartFundETH.name(), 'NEW NAME FOR ETH FUND')
     })
   })
 

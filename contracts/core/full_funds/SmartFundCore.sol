@@ -702,6 +702,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
       uint256 profit = uint256(int256(fundValue) - curtotalWeiDeposited);
       // remove the money already taken by the fund manager and take percentage
       fundManagerTotalCut = profit.mul(successFee).div(TOTAL_PERCENTAGE);
+      // If manager alredy cut from the best profit period, just return 0
       fundManagerRemainingCut = fundManagerTotalCut > fundManagerCashedOut
       ? fundManagerTotalCut.sub(fundManagerCashedOut)
       : 0;
@@ -827,6 +828,15 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   */
   function updateSwapperStatus(address _swapper, bool _status) external onlyOwner {
     swappers[_swapper] = _status;
+  }
+
+  /**
+  * @dev Allow owner update fund name
+  *
+  * @param _name      new fund name 
+  */
+  function updateFundName(string memory _name) external onlyOwner {
+    name = _name;
   }
 
   /**
