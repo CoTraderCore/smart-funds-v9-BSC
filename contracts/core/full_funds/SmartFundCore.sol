@@ -139,9 +139,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   event SmartFundCreated(address indexed owner);
 
   // modifier role which allow call trade, buy/sell pool, call defi
-  modifier onlySwapper () {
-  require(swappers[msg.sender], "Not swapper");
-  _;
+  function onlySwapper() internal view {
+    require(swappers[msg.sender], "Not swapper");
   }
 
   constructor(
@@ -326,8 +325,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     uint256 _minReturn
   )
     external
-    onlySwapper
   {
+    onlySwapper();
     require(_minReturn > 0, "MIN_RETURN_0");
 
     uint256 receivedAmount;
@@ -396,8 +395,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
    bytes calldata     _additionData
   )
     external
-    onlySwapper
   {
+   onlySwapper();
    // for determine the exact number of received pool
    uint256 poolAmountReceive;
 
@@ -470,8 +469,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     bytes calldata _additionData
   )
     external
-    onlySwapper
   {
+    onlySwapper();
     // approve pool
     _poolToken.approve(address(poolPortal), _amount);
 
@@ -515,8 +514,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     bytes calldata _additionalData
   )
     external
-    onlySwapper
   {
+    onlySwapper();
     // event data
     string memory eventType;
     address[] memory tokensToReceive;
@@ -833,7 +832,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   /**
   * @dev Allow owner update fund name
   *
-  * @param _name      new fund name 
+  * @param _name      new fund name
   */
   function updateFundName(string memory _name) external onlyOwner {
     name = _name;
