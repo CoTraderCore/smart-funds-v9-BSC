@@ -43,7 +43,7 @@ contract SmartFundETH is SmartFundCore {
     _poolPortalAddress,
     _defiPortal,
     _permittedAddresses,
-    address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee),
+    address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
     _isRequireTradeVerification
   )
   public{}
@@ -114,7 +114,7 @@ contract SmartFundETH is SmartFundCore {
     uint256 tokensValue = exchangePortal.getTotalValue(
       fromAddresses,
       amounts,
-      address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)
+      address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
     );
 
     // Sum ETH + ERC20
@@ -130,7 +130,7 @@ contract SmartFundETH is SmartFundCore {
   */
   function getTokenValue(IERC20 _token) public override view returns (uint256) {
     // return ETH
-    if (_token == IERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)){
+    if (_token == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       return address(this).balance;
     }
     // return ERC20 in ETH
@@ -138,7 +138,7 @@ contract SmartFundETH is SmartFundCore {
       uint256 tokenBalance = _token.balanceOf(address(this));
       return exchangePortal.getValue(
         address(_token),
-        address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee),
+        address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
         tokenBalance
       );
     }

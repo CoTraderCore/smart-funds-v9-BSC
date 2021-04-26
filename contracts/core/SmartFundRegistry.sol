@@ -81,7 +81,7 @@ contract SmartFundRegistry is Ownable {
     address smartFund;
 
     // ETH case
-    if(_coreAsset == address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)){
+    if(_coreAsset == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       // Create ETH Fund
       smartFund = smartFundETHFactory.createSmartFund(
         msg.sender,

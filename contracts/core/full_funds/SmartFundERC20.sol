@@ -108,7 +108,7 @@ contract SmartFundERC20 is SmartFundCore {
   function calculateFundValue() public override view returns (uint256) {
     // Convert ETH balance to core ERC20
     uint256 ethBalance = exchangePortal.getValue(
-      address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee),
+      address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
       coreFundAsset,
       address(this).balance
     );
@@ -153,7 +153,7 @@ contract SmartFundERC20 is SmartFundCore {
   */
   function getTokenValue(IERC20 _token) public override view returns (uint256) {
     // get ETH in core ERC20
-    if (_token == IERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)){
+    if (_token == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       return exchangePortal.getValue(
         address(_token),
         coreFundAsset,

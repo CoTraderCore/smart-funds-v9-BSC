@@ -179,7 +179,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     }
 
     // Initial Token is Ether
-    tokenAddresses.push(address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee));
+    tokenAddresses.push(address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE));
 
     // Initial interfaces
     exchangePortal = ExchangePortalInterface(_exchangePortalAddress);
@@ -331,7 +331,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
 
     uint256 receivedAmount;
 
-    if (_source == IERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)) {
+    if (_source == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
       // Make sure fund contains enough ether
       require(address(this).balance >= _sourceAmount, "NOT_ENOUGH_ETH");
       // Call trade on ExchangePortal along with ether
@@ -579,7 +579,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     returns (uint256 etherAmount)
   {
     for(uint8 i = 0; i < addresses.length; i++){
-      if(addresses[i] != address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)){
+      if(addresses[i] != address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
         // approve
         IERC20(addresses[i]).approve(spender, amounts[i]);
       }
@@ -601,7 +601,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   */
   function _addToken(address _token) internal {
     // don't add token to if we already have it in our list
-    if (tokensTraded[_token] || (_token == address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)))
+    if (tokensTraded[_token] || (_token == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)))
       return;
 
     tokensTraded[_token] = true;
@@ -620,7 +620,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   *
   */
   function removeToken(address _token, uint256 _tokenIndex) public onlyOwner {
-    require(_token != address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee));
+    require(_token != address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE));
     require(tokensTraded[_token]);
     require(IERC20(_token).balanceOf(address(this)) == 0);
     require(tokenAddresses[_tokenIndex] == _token);
@@ -756,7 +756,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
 
   // This method was added to easily record the funds token balances, may (should?) be removed in the future
   function getFundTokenHolding(IERC20 _token) external view returns (uint256) {
-    if (_token == IERC20(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee))
+    if (_token == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE))
       return address(this).balance;
     return _token.balanceOf(address(this));
   }
@@ -846,7 +846,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   */
   function emergencyWithdraw(address _token) external onlyOwner {
     require(totalShares == 0);
-    if (_token == address(0x00eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee)) {
+    if (_token == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) {
       msg.sender.transfer(address(this).balance);
     } else {
       IERC20(_token).transfer(msg.sender, IERC20(_token).balanceOf(address(this)));
