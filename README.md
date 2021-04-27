@@ -9,7 +9,15 @@ NOTE: in separate console
 ```
 
 
-# Updates
+# Mainent deploy note
+
+```
+Don't forget set new pool, defi and exchange, portals to permitted type storage contract as permitted to write
+Don't forget add new addresses to new permittedAddresses contract
+Don't forget set latest 1inch contract
+```
+
+# Updates in v9
 ```
 1) Add role swaper which can trade, pool and call defi protocols.
 2) Fix manager take cut for case manager take cut on the best profit period when profit go up then go down.
@@ -26,14 +34,6 @@ Exchange and Pool Portals v7 not has incompatibility with older versions,
 so frontend should support different version of portals
 ```
 
-
-# Mainent deploy note
-
-```
-Don't forget set new pool and exchange, portals, defi to permitted type storage
-Don't forget add new addresses to new permittedAddresses contract
-Don't forget set latest 1incg contract
-```
 
 # ADDRESSES
 
