@@ -103,12 +103,12 @@ New Exchange Portal
 
 SmartFundETHFactory
 
-0x9Ea1dC859Eb4D37Ce0a3a4940a96126de8547f4A
+0xc2cec1dd326467186Dd821c9EB1F81937acB7Be3
 
 
 SmartFundERC20Factory
 
-0x788cc1a7f4cC7669B2c966AB05363c4F163A7f58
+
 
 
 SmartFundRegistry

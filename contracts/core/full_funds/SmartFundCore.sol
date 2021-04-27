@@ -156,8 +156,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     bool    _isRequireTradeVerification
   )public{
     // never allow a 100% fee
-    require(_successFee < TOTAL_PERCENTAGE, "can not be 100% fee");
-    require(_owner != address(0), "can not be 0 address");
+    require(_successFee < TOTAL_PERCENTAGE, "100% fee");
+    require(_owner != address(0), "owner 0x");
 
     name = _name;
     successFee = _successFee;
@@ -192,7 +192,7 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     // Init owner as swapper
     swappers[_owner] = true;
 
-    // Emit event 
+    // Emit event
     emit SmartFundCreated(_owner);
   }
 
