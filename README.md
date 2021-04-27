@@ -12,7 +12,7 @@ NOTE: in separate console
 # Mainent deploy note
 
 ```
-Don't forget set new pool, defi and exchange, portals to permitted type storage contract as permitted to write
+Don't forget set new pool, defi and exchange, portals to Tokens Type storage contract as permitted to write
 Don't forget add new addresses to new permittedAddresses contract
 Don't forget set latest 1inch contract
 ```
