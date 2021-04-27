@@ -108,7 +108,7 @@ SmartFundETHFactory
 
 SmartFundERC20Factory
 
-
+0x2c8aA3148aa50bbfedF711C095DE16975896D280
 
 
 SmartFundRegistry
