@@ -194,9 +194,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
     isRequireTradeVerification = _isRequireTradeVerification;
 
     // Init owner as swapper
-    swappers[msg.sender] = true;
+    swappers[_owner] = true;
 
-    emit SmartFundCreated(owner());
+    emit SmartFundCreated(_owner);
   }
 
   // virtual methods
