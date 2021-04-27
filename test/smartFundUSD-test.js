@@ -206,8 +206,8 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
 
     // Deploy USD fund
     smartFundERC20 = await SmartFundERC20.new(
-      '0x0000000000000000000000000000000000000000', // address _owner,
-      'TEST ERC20 FUND',                              // string _name,
+      userOne,                                      // address _owner,
+      'TEST ERC20 FUND',                            // string _name,
       successFee,                                   // uint256 _successFee,
       COT_DAO_WALLET.address,                       // address _platformAddress,
       exchangePortal.address,                       // address _exchangePortalAddress,
