@@ -22,9 +22,6 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
 
   uint public version = 5;
 
-  // Contract for handle tokens types
-  ITokensTypeStorage public tokensTypes;
-
   // Contract for merkle tree white list verification
   IMerkleTreeTokensVerification public merkleTreeWhiteList;
 
@@ -190,8 +187,6 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
      require(success, "Fail 1inch call");
      // get received amount
      destinationReceived = tokenBalance(IERC20(destinationToken));
-     // set token type
-     tokensTypes.addNewTokenType(destinationToken, "CRYPTOCURRENCY");
   }
 
   // Facilitates for send source remains
