@@ -1,6 +1,7 @@
 import "../interfaces/IDecimals.sol";
 import "../../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "../../uniswap/interfaces/IUniswapV2Router.sol";
+import "../../zeppelin-solidity/contracts/access/Ownable.sol";
 
 interface Router {
   function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
@@ -11,7 +12,7 @@ interface Factory {
 }
 
 
-contract PricePortalPancake {
+contract PricePortalPancake is Ownable {
   address public WETH;
   address public router;
   address public factory;
@@ -109,5 +110,9 @@ contract PricePortalPancake {
   {
     uint256[] memory res = Router(router).getAmountsOut(fromAmount, path);
     return res[1];
+  }
+
+  function addConnector(address connector) external onlyOwner {
+    connectors.push(connector);
   }
 }
