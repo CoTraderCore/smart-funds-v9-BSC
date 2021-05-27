@@ -15,6 +15,7 @@ import "../../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "../interfaces/IPricePortal.sol";
 import "../interfaces/ExchangePortalInterface.sol";
 import "../interfaces/IMerkleTreeTokensVerification.sol";
+import "../../uniswap/interfaces/IUniswapV2Router.sol";
 
 
 contract ExchangePortalLight is ExchangePortalInterface, Ownable {
@@ -28,13 +29,17 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
   // 1 inch protocol for calldata
   address public OneInchRoute;
 
+  address public WETH;
+  address public coswapRouter;
+  address public pancakeRouter;
+
   IPricePortal public pricePortal;
 
 
   // Enum
   // NOTE: You can add a new type at the end, but DO NOT CHANGE this order,
   // because order has dependency in other contracts like ConvertPortal
-  enum ExchangeType { OneInchRoute }
+  enum ExchangeType { OneInchRoute, CoSwap, Pancake }
 
   // Trade event
   event Trade(
@@ -60,17 +65,24 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
   * @param _pricePortal            address of price portal
   * @param _OneInchRoute           address of oneInch ETH contract
   * @param _merkleTreeWhiteList    address of the IMerkleTreeWhiteList
+  * @param _WETH                   WBNB address
   */
   constructor(
     address _pricePortal,
     address _OneInchRoute,
-    address _merkleTreeWhiteList
+    address _merkleTreeWhiteList,
+    address _WETH,
+    address _coswapRouter,
+    address _pancakeRouter
     )
     public
   {
     pricePortal = IPricePortal(_pricePortal);
     OneInchRoute = _OneInchRoute;
     merkleTreeWhiteList = IMerkleTreeTokensVerification(_merkleTreeWhiteList);
+    WETH = _WETH;
+    coswapRouter = _coswapRouter;
+    pancakeRouter = _pancakeRouter;
   }
 
 
@@ -119,6 +131,7 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
       require(msg.value == 0);
     }
 
+    // trade via 1inch
     if (_type == uint(ExchangeType.OneInchRoute)){
       receivedAmount = _tradeViaOneInchRoute(
           address(_source),
@@ -128,8 +141,28 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
       );
     }
 
+    // trade via CoSwap
+    else if(_type == uint(ExchangeType.CoSwap)){
+      receivedAmount = _tradeViaUniswapV2BasedDEX(
+        address(_source),
+        address(_destination),
+        _sourceAmount,
+        coswapRouter
+      );
+    }
+
+    // trade via Pancake
+    else if(_type == uint(ExchangeType.Pancake)){
+      receivedAmount = _tradeViaUniswapV2BasedDEX(
+        address(_source),
+        address(_destination),
+        _sourceAmount,
+        pancakeRouter
+      );
+    }
+
+    // unknown exchange type
     else {
-      // unknown exchange type
       revert("Unknown type");
     }
 
@@ -186,6 +219,59 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
      // check trade status
      require(success, "Fail 1inch call");
      // get received amount
+     destinationReceived = tokenBalance(IERC20(destinationToken));
+  }
+
+  function _tradeViaUniswapV2BasedDEX(
+    address sourceToken,
+    address destinationToken,
+    uint256 sourceAmount,
+    address router
+  )
+    private
+    returns(uint256 destinationReceived)
+  {
+     address[] memory path = new address[](2);
+
+     // swap from ETH
+     if(IERC20(sourceToken) == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
+       path[0] = WETH;
+       path[1] = destinationToken;
+
+       IUniswapV2Router(router).swapExactETHForTokens.value(sourceAmount)(
+         1,
+         path,
+         address(this),
+         now + 15 minutes
+       );
+     }
+     // swap to ETH
+     else if(IERC20(destinationToken) == IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
+       path[0] = sourceToken;
+       path[1] = WETH;
+
+       IUniswapV2Router(router).swapExactTokensForETH(
+         sourceAmount,
+         1,
+         path,
+         address(this),
+         now + 15 minutes
+       );
+     }
+     // swap between ERC20 only
+     else{
+       path[0] = sourceToken;
+       path[1] = destinationToken;
+
+       IUniswapV2Router(router).swapExactTokensForTokens(
+           sourceAmount,
+           1,
+           path,
+           address(this),
+           now + 15 minutes
+       );
+     }
+
      destinationReceived = tokenBalance(IERC20(destinationToken));
   }
 
