@@ -250,6 +250,8 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
        path[0] = sourceToken;
        path[1] = WETH;
 
+       _transferFromSenderAndApproveTo(IERC20(sourceToken), sourceAmount, router);
+
        IUniswapV2Router(router).swapExactTokensForETH(
          sourceAmount,
          1,
@@ -262,6 +264,8 @@ contract ExchangePortalLight is ExchangePortalInterface, Ownable {
      else{
        path[0] = sourceToken;
        path[1] = destinationToken;
+
+       _transferFromSenderAndApproveTo(IERC20(sourceToken), sourceAmount, router);
 
        IUniswapV2Router(router).swapExactTokensForTokens(
            sourceAmount,
