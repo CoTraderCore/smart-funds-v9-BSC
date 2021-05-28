@@ -14,20 +14,26 @@ interface Factory {
 
 contract PricePortalPancake is Ownable {
   address public WETH;
-  address public router;
+  address public pancakeRouter;
+  address public coswapRouter;
+  address public bCOT;
   address public factory;
   address[] public connectors;
 
   constructor(
     address _WETH,
-    address _router,
+    address _pancakeRouter,
+    address _coswapRouter,
+    address _bCOT,
     address _factory,
     address[] memory _connectors
   )
     public
   {
     WETH = _WETH;
-    router = _router;
+    pancakeRouter = _pancakeRouter;
+    coswapRouter = _coswapRouter;
+    bCOT = _bCOT;
     factory = _factory;
     connectors = _connectors;
   }
@@ -38,52 +44,102 @@ contract PricePortalPancake is Ownable {
     address _to,
     uint256 _amount
   )
+    internal
+    view
+    returns (uint256 value)
+  {
+    // if direction the same, just return amount
+    if(_from == _to)
+      return _amount;
+
+    // if wrong amount, just return amount
+    if(_amount == 0)
+      return _amount;
+
+    // get price
+    // WRAP ETH token with weth
+    address wrapETH = WETH;
+
+    address fromAddress = _from == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
+    ? wrapETH
+    : _from;
+
+    address toAddress = _to == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
+    ? wrapETH
+    : _to;
+
+    // use coSwap for bCOT
+    if(_from == bCOT){
+     return getPriceForBCOT(toAddress, _amount);
+    }
+    // use Pancake only
+    else{
+      return getPriceFromPancake(
+        fromAddress,
+        toAddress,
+        _amount
+      )
+    }
+  }
+
+  // helper for get ratio between pancake assets
+  function getPriceFromPancake(
+    address fromAddress,
+    address toAddress,
+    uint256 _amount
+  )
     external
     view
     returns (uint256 value)
   {
-    if(_amount > 0){
-      // if direction the same, just return amount
-      if(_from == _to)
-         return _amount;
+    // if pair exits get rate between this pair
+    if(Factory(factory).getPair(fromAddress, toAddress) != address(0)){
+      address[] memory path = new address[](2);
+      path[0] = fromAddress;
+      path[1] = toAddress;
 
-      // WRAP ETH token with weth
-      address wrapETH = WETH;
-
-      address fromAddress = _from == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-      ? wrapETH
-      : _from;
-
-      address toAddress = _to == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)
-      ? wrapETH
-      : _to;
-
-      // if pair exits get rate between this pair
-      if(Factory(factory).getPair(fromAddress, toAddress) != address(0)){
-        address[] memory path = new address[](2);
-        path[0] = fromAddress;
-        path[1] = toAddress;
-
-        return routerRatio(path, _amount);
-      }
-      // else get connector
-      else{
-        address connector = findConnector(_to);
-        require(connector != address(0), "0 connector");
-        address[] memory path = new address[](3);
-        path[0] = fromAddress;
-        path[1] = connector;
-        path[2] = toAddress;
-
-        return routerRatio(path, _amount);
-      }
+      return routerRatio(path, _amount, pancakeRouter);
     }
+    // else get connector
     else{
-      return 0;
+      address connector = findConnector(_to);
+      require(connector != address(0), "0 connector");
+      address[] memory path = new address[](3);
+      path[0] = fromAddress;
+      path[1] = connector;
+      path[2] = toAddress;
+
+      return routerRatio(path, _amount, pancakeRouter);
     }
   }
 
-  // helper for find connector
+  function getPriceForBCOT(address toAddress, uint256 _amount)
+    internal
+    view
+    returns(uint256)
+  {
+    // get bCOT in WETH from coswap
+    address[] path = new address[](2);
+    path[0] = bCOT;
+    path[1] = WETH;
+
+    uint256 bCOTinWETH = routerRatio(path, _amount, coswapRouter);
+
+    // if toAddress == weth just return weth result
+    if(toAddress == WETH){
+      return bCOTinWETH
+    }
+    // else convert weth result to toAddress via Pancake
+    else{
+      return getPriceFromPancake(
+        WETH,
+        toAddress,
+        bCOTinWETH
+      )
+    }
+  }
+
+  // helper for find common connectors between tokens
   function findConnector(address _to)
     public
     view
@@ -103,7 +159,7 @@ contract PricePortalPancake is Ownable {
   }
 
   // helper for get price from router
-  function routerRatio(address[] memory path, uint256 fromAmount)
+  function routerRatio(address[] memory path, uint256 fromAmount, address router)
     public
     view
     returns (uint256)
@@ -112,6 +168,7 @@ contract PricePortalPancake is Ownable {
     return res[1];
   }
 
+  // owner can add common connectors
   function addConnector(address connector) external onlyOwner {
     connectors.push(connector);
   }
