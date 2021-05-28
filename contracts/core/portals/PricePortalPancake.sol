@@ -78,7 +78,7 @@ contract PricePortalPancake is Ownable {
         fromAddress,
         toAddress,
         _amount
-      )
+      );
     }
   }
 
@@ -88,7 +88,7 @@ contract PricePortalPancake is Ownable {
     address toAddress,
     uint256 _amount
   )
-    external
+    internal
     view
     returns (uint256 value)
   {
@@ -102,7 +102,7 @@ contract PricePortalPancake is Ownable {
     }
     // else get connector
     else{
-      address connector = findConnector(_to);
+      address connector = findConnector(toAddress);
       require(connector != address(0), "0 connector");
       address[] memory path = new address[](3);
       path[0] = fromAddress;
@@ -119,7 +119,7 @@ contract PricePortalPancake is Ownable {
     returns(uint256)
   {
     // get bCOT in WETH from coswap
-    address[] path = new address[](2);
+    address[] memory path = new address[](2);
     path[0] = bCOT;
     path[1] = WETH;
 
@@ -127,7 +127,7 @@ contract PricePortalPancake is Ownable {
 
     // if toAddress == weth just return weth result
     if(toAddress == WETH){
-      return bCOTinWETH
+      return bCOTinWETH;
     }
     // else convert weth result to toAddress via Pancake
     else{
@@ -135,7 +135,7 @@ contract PricePortalPancake is Ownable {
         WETH,
         toAddress,
         bCOTinWETH
-      )
+      );
     }
   }
 
