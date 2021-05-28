@@ -42,10 +42,17 @@ so frontend should support different version of portals
 
 optimization true 200
 
+WETH
+
+0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c
 
 DAI BSC
 
 0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3
+
+CoSwap Router
+
+0x82d45a1cCaBE624eEB275B9d3DAA177aFf82953f
 
 Pancake Router
 
@@ -108,8 +115,12 @@ New Exchange Portal
 
 0x5f0b0f12718c256a0E172d199AA50F7456fd24AA
 
+ExchangePortalLight (NEW)
 
-ExchangePortalLight
+0x169331EC668f3ACa19feb89AC300C4b291c4C586
+
+
+ExchangePortalLight (OLD)
 
 0x34A872911a7a3C7112F4821cfaAe42660D24AEE9
 
