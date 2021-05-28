@@ -44,7 +44,7 @@ contract PricePortalPancake is Ownable {
     address _to,
     uint256 _amount
   )
-    internal
+    external
     view
     returns (uint256 value)
   {

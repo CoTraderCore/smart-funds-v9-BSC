@@ -90,8 +90,11 @@ Pool Portal 1 inch
 
 0x2b4ba0A92CcC11E839d1928ae73b34E7aaC2C040
 
+Price Portal Pancake (NEW)
 
-Price Portal Pancake
+0xE8eF35b4E165C98075453846461cc439BfF0aE99
+
+Price Portal Pancake (OLD)
 
 0x7eb09Fbd33b87808512E7EE20b68933876862f9f
 
