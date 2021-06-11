@@ -54,9 +54,24 @@ CoSwap Router
 
 0x82d45a1cCaBE624eEB275B9d3DAA177aFf82953f
 
-Pancake Router
+
+Pancake Router A
+
+0x10ED43C718714eb63d5aA57B78B54704E256024E
+
+
+Pancake Router B
 
 0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F
+
+
+Pancake Factory A
+
+0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73
+
+Pancake Factory B
+
+0xBCfCcbde45cE874adCB698cC183deBcF17952812
 
 
 1inch Router
