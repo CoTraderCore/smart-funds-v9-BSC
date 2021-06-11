@@ -160,20 +160,16 @@ contract PricePortalPancakeTwoFactories is Ownable {
     uint256 _lengthCached = connectors.length;
 
     for(uint i =0; i< _lengthCached; i++){
-      address pair = Factory(_factoryACached).getPair(_to, connectors[i]);
       // if exist on factory A return
-      if(pair != address(0)){
+      if(Factory(_factoryACached).getPair(_to, connectors[i]) != address(0)){
         connector = connectors[i];
         router = pancakeRouterA;
       }
 
       // else check on factory B
-      else{
-       pair = Factory(_factoryBCached).getPair(_to, connectors[i]);
-       if(pair != address(0)){
-         connector = connectors[i];
-         router = pancakeRouterB;
-       }
+      if(Factory(_factoryBCached).getPair(_to, connectors[i]) != address(0)){
+       connector = connectors[i];
+       router = pancakeRouterB;
       }
       // end loop
     }
