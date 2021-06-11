@@ -3,10 +3,6 @@ import "../../zeppelin-solidity/contracts/math/SafeMath.sol";
 import "../../uniswap/interfaces/IUniswapV2Router.sol";
 import "../../zeppelin-solidity/contracts/access/Ownable.sol";
 
-interface Router {
-  function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
-}
-
 interface Factory {
   function getPair(address tokenA, address tokenB) external view returns (address pair);
 }
@@ -33,12 +29,12 @@ contract PricePortalPancakeTwoFactories is Ownable {
     public
   {
     WETH = _WETH;
-    pancakeRouter = _pancakeRouterA;
-    pancakeRouter = _pancakeRouterB;
+    pancakeRouterA = _pancakeRouterA;
+    pancakeRouterB = _pancakeRouterB;
     coswapRouter = _coswapRouter;
     bCOT = _bCOT;
-    factoryA = Router(_pancakeRouterA).factory();
-    factoryB = Router(_pancakeRouterB).factory();
+    factoryA = IUniswapV2Router(_pancakeRouterA).factory();
+    factoryB = IUniswapV2Router(_pancakeRouterB).factory();
     connectors = _connectors;
   }
 
@@ -167,19 +163,19 @@ contract PricePortalPancakeTwoFactories is Ownable {
       address pair = Factory(_factoryACached).getPair(_to, connectors[i]);
       // if exist on factory A return
       if(pair != address(0)){
-        connector = connectors[i]
-        router = pancakeRouterA
+        connector = connectors[i];
+        router = pancakeRouterA;
       }
 
       // else check on factory B
       else{
        pair = Factory(_factoryBCached).getPair(_to, connectors[i]);
        if(pair != address(0)){
-         connector = connectors[i]
-         router = pancakeRouterB
+         connector = connectors[i];
+         router = pancakeRouterB;
        }
       }
-      // end loop 
+      // end loop
     }
   }
 
@@ -189,7 +185,7 @@ contract PricePortalPancakeTwoFactories is Ownable {
     view
     returns (uint256)
   {
-    uint256[] memory res = Router(router).getAmountsOut(fromAmount, path);
+    uint256[] memory res = IUniswapV2Router(router).getAmountsOut(fromAmount, path);
     return res[1];
   }
 
