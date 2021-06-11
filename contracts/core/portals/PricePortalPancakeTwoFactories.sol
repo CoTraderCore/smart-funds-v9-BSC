@@ -14,7 +14,8 @@ interface Factory {
 
 contract PricePortalPancakeTwoFactories is Ownable {
   address public WETH;
-  address public pancakeRouter;
+  address public pancakeRouterA;
+  address public pancakeRouterB;
   address public coswapRouter;
   address public bCOT;
   address public factoryA;
@@ -23,21 +24,21 @@ contract PricePortalPancakeTwoFactories is Ownable {
 
   constructor(
     address _WETH,
-    address _pancakeRouter,
+    address _pancakeRouterA,
+    address _pancakeRouterB,
     address _coswapRouter,
     address _bCOT,
-    address _factoryA,
-    address _factoryB,
     address[] memory _connectors
   )
     public
   {
     WETH = _WETH;
-    pancakeRouter = _pancakeRouter;
+    pancakeRouter = _pancakeRouterA;
+    pancakeRouter = _pancakeRouterB;
     coswapRouter = _coswapRouter;
     bCOT = _bCOT;
-    factoryA = _factoryA;
-    factoryB = _factoryB;
+    factoryA = Router(_pancakeRouterA).factory();
+    factoryB = Router(_pancakeRouterB).factory();
     connectors = _connectors;
   }
 
@@ -95,24 +96,32 @@ contract PricePortalPancakeTwoFactories is Ownable {
     view
     returns (uint256 value)
   {
-    // if pair exits get rate between this pair
+    // if pair exits in factory A get rate between this pair
     if(Factory(factoryA).getPair(fromAddress, toAddress) != address(0)){
       address[] memory path = new address[](2);
       path[0] = fromAddress;
       path[1] = toAddress;
 
-      return routerRatio(path, _amount, pancakeRouter);
+      return routerRatio(path, _amount, pancakeRouterA);
     }
-    // else get connector
+    // else if pair exits in factory B get rate between this pair
+    else if(Factory(factoryB).getPair(fromAddress, toAddress) != address(0)){
+      address[] memory path = new address[](2);
+      path[0] = fromAddress;
+      path[1] = toAddress;
+
+      return routerRatio(path, _amount, pancakeRouterB);
+    }
+    // else get price via common connector
     else{
-      address connector = findConnector(toAddress);
+      (address connector, address router) = findConnector(toAddress);
       require(connector != address(0), "0 connector");
       address[] memory path = new address[](3);
       path[0] = fromAddress;
       path[1] = connector;
       path[2] = toAddress;
 
-      return routerRatio(path, _amount, pancakeRouter);
+      return routerRatio(path, _amount, router);
     }
   }
 
@@ -146,19 +155,32 @@ contract PricePortalPancakeTwoFactories is Ownable {
   function findConnector(address _to)
     public
     view
-    returns (address connector)
+    returns (address connector, address router)
   {
     // cache storage vars in memory for safe gas
     address _factoryACached = factoryA;
+    address _factoryBCached = factoryB;
+
     uint256 _lengthCached = connectors.length;
 
     for(uint i =0; i< _lengthCached; i++){
       address pair = Factory(_factoryACached).getPair(_to, connectors[i]);
-      if(pair != address(0))
-         return connectors[i];
-    }
+      // if exist on factory A return
+      if(pair != address(0)){
+        connector = connectors[i]
+        router = pancakeRouterA
+      }
 
-    return address(0);
+      // else check on factory B
+      else{
+       pair = Factory(_factoryBCached).getPair(_to, connectors[i]);
+       if(pair != address(0)){
+         connector = connectors[i]
+         router = pancakeRouterB
+       }
+      }
+      // end loop 
+    }
   }
 
   // helper for get price from router
