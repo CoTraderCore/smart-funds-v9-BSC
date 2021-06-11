@@ -151,7 +151,7 @@ contract PricePortalPancakeTwoFactories is Ownable {
   function findConnector(address _to)
     public
     view
-    returns (address connector, address router)
+    returns (address, address)
   {
     // cache storage vars in memory for safe gas
     address _factoryACached = factoryA;
@@ -161,18 +161,17 @@ contract PricePortalPancakeTwoFactories is Ownable {
 
     for(uint i =0; i< _lengthCached; i++){
       // if exist on factory A return
-      if(Factory(_factoryACached).getPair(_to, connectors[i]) != address(0)){
-        connector = connectors[i];
-        router = pancakeRouterA;
-      }
+      if(Factory(_factoryACached).getPair(_to, connectors[i]) != address(0))
+        return (connectors[i], pancakeRouterA);
+
 
       // else check on factory B
       if(Factory(_factoryBCached).getPair(_to, connectors[i]) != address(0)){
-       connector = connectors[i];
-       router = pancakeRouterB;
+        return (connectors[i], pancakeRouterB);
       }
-      // end loop
     }
+
+    return(address(0), address(0));
   }
 
   // helper for get price from router
