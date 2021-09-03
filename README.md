@@ -25,6 +25,7 @@ Don't forget set latest 1inch contract
 4) Fund creator can change fund name.
 5) Add any fund asset type.
 6) Protect from manager take cut flash loan
+7) Remove Defi and Pools
 ```
 
 
