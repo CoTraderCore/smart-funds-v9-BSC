@@ -4,9 +4,6 @@ pragma solidity ^0.6.12;
 
 /*
 * This contract do swap for ERC20 via 1inch
-
-  Also this contract allow get ratio between crypto curency assets
-  Also get ratio for Bancor and Uniswap pools
 */
 
 import "../../zeppelin-solidity/contracts/access/Ownable.sol";
