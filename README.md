@@ -24,6 +24,7 @@ Don't forget set latest 1inch contract
 3) Optimize gas (remove or cache global vars in functions), for funds with 5-10 and more tokens gas now in n x less.
 4) Fund creator can change fund name.
 5) Add any fund asset type.
+6) Protect from manager take cut flash loan
 ```
 
 

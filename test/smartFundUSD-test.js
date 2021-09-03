@@ -576,7 +576,8 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
         assert.equal(fundManagerRemainingCut, toWei(String(0.1)))
         assert.equal(fundManagerTotalCut, toWei(String(0.1)))
 
-          // // FM now withdraws their profit
+        await advanceTimeAndBlock(duration.seconds(31))
+        // // FM now withdraws their profit
         await smartFundERC20.fundManagerWithdraw({ from: userOne })
         // Manager, can get his 10%, and remains 0.0001996 it's  platform commision
         assert.equal(await DAI.balanceOf(smartFundERC20.address), 0)
@@ -644,6 +645,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
 
         assert.equal(await smartFundERC20.calculateFundValue(), toWei(String(0.1)))
 
+        await advanceTimeAndBlock(duration.seconds(31))
         // FM now withdraws their profit
         await smartFundERC20.fundManagerWithdraw({ from: userOne })
         assert.equal(await DAI.balanceOf(smartFundERC20.address), 0)
@@ -849,6 +851,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
       await deployContracts(2000)
       await fundManagerTest(20)
 
+      await advanceTimeAndBlock(duration.seconds(31))
       await smartFundERC20.fundManagerWithdraw({ from: userOne })
 
       const {
@@ -866,6 +869,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
       await deployContracts(2000)
       await fundManagerTest(20)
 
+      await advanceTimeAndBlock(duration.seconds(31))
       await smartFundERC20.fundManagerWithdraw({ from: userOne })
       await smartFundERC20.calculateFundManagerCut()
 
@@ -873,6 +877,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
       await exchangePortal.setRatio(1, 100000000)
 
       await smartFundERC20.calculateFundManagerCut()
+      await advanceTimeAndBlock(duration.seconds(31))
       // take cut
       await smartFundERC20.fundManagerWithdraw({ from: userOne })
       await smartFundERC20.calculateFundManagerCut()
@@ -941,6 +946,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
         }
       )
 
+      await advanceTimeAndBlock(duration.seconds(31))
       await smartFundERC20.fundManagerWithdraw()
 
       await smartFundERC20.withdraw(0, { from: userTwo })
@@ -1397,6 +1403,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
       assert.equal(fundManagerRemainingCut, toWei(String(0.1)))
       assert.equal(fundManagerTotalCut, toWei(String(0.1)))
 
+      await advanceTimeAndBlock(duration.seconds(31))
       // // FM now withdraws their profit
       await smartFundERC20.fundManagerWithdraw({ from: userOne })
 
@@ -1475,6 +1482,7 @@ contract('smartFundERC20', function([userOne, userTwo, userThree]) {
       assert.equal(fundManagerRemainingCut, toWei(String(0.1)))
       assert.equal(fundManagerTotalCut, toWei(String(0.1)))
 
+      await advanceTimeAndBlock(duration.seconds(31))
       // // FM now withdraws their profit
       await smartFundERC20.fundManagerWithdraw({ from: userOne })
 

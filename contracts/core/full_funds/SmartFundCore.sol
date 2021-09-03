@@ -98,6 +98,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   // If true the contract will require each new asset to buy to be on a special Merkle tree list
   bool public isRequireTradeVerification;
 
+  // Protect from flash loan atack
+  uint256 public fundManagerWithdrawDelay;
+
   // how many shares belong to each address
   mapping (address => uint256) public addressToShares;
 
@@ -361,6 +364,9 @@ abstract contract SmartFundCore is Ownable, IERC20 {
 
     // add token to trader list
     _addToken(address(_destination));
+
+    // set manager withdraw delay
+    fundManagerWithdrawDelay = now + 30 seconds;
 
     // emit event
     emit Trade(
@@ -709,6 +715,8 @@ abstract contract SmartFundCore is Ownable, IERC20 {
   * @dev Allows the fund manager to withdraw their cut of the funds profit
   */
   function fundManagerWithdraw() public onlyOwner {
+    require(now >= fundManagerWithdrawDelay, "Need wait 30 seconds after trade");
+    
     uint256 fundManagerCut;
     uint256 fundValue;
 
