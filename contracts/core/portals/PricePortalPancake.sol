@@ -165,7 +165,7 @@ contract PricePortalPancake is Ownable {
     returns (uint256)
   {
     uint256[] memory res = Router(router).getAmountsOut(fromAmount, path);
-    return res[1];
+    return res[path.length - 1];
   }
 
   // owner can add common connectors
