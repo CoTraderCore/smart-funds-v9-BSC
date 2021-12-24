@@ -1,12 +1,15 @@
 pragma solidity ^0.6.12;
 
 import "../zeppelin-solidity/contracts/access/Ownable.sol";
-import "../zeppelin-solidity/contracts/token/IERC20";
-import "./IConvertPortal"
+import "../zeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import "../zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./IConvertPortal.sol";
 
 contract PlatformWallet is Ownable {
+  using SafeMath for uint;
+
   address public COT;
-  address public partnerAddress;
+  address public partnerTokenAddress;
   IConvertPortal public convertPortal;
 
   uint cotSplit = 50;
@@ -17,9 +20,43 @@ contract PlatformWallet is Ownable {
     convertPortal = IConvertPortal(_convertPortal);
   }
 
-  function destribution(address[] memory tokens) external {
+  // destribute tokens
+  function destributionTokens(address[] memory tokens) external {
+    address ETH_TOKEN = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    for(uint i = 0; i < tokens.length; i++){
+       uint totalBalance = tokens[i] == ETH_TOKEN
+       ? address(this).balance
+       : IERC20(tokens[i]).balanceOf(address(this));
 
+       // convert and burn COT
+       uint cotSplitAmount = totalBalance.div(100).mul(cotSplit);
+       if(cotSplitAmount > 0)
+         convertAndBurn(tokens[i], COT, cotSplitAmount);
+
+       // convert and burn Partner token
+       uint partnerSplitAmount = totalBalance.div(100).mul(partnerSplit);
+       if(partnerSplitAmount > 0)
+         convertAndBurn(
+           tokens[i],
+           partnerTokenAddress,
+           partnerSplitAmount
+         );
+
+       // transfer to platform
+       uint platformSplitAmount = totalBalance.div(100).mul(platformSplit);
+       if(platformSplitAmount > 0)
+         // ETH case
+         if(tokens[i] == ETH_TOKEN){
+           payable(owner()).transfer(platformSplitAmount);
+         }
+         // ERC20 case
+         else{
+           IERC20(tokens[i]).transfer(owner(), platformSplitAmount);
+         }
+     }
   }
+
+  // helpers
 
   function convertAndBurn(
     address _fromToken,
@@ -28,10 +65,19 @@ contract PlatformWallet is Ownable {
   )
   internal
   {
-    uint256 recieved = convertPortal(_fromToken, _toToken, _amount);
-    IERC20(_toToken).transfer(0x000000000000000000000000000000000000dEaD);
+
+    uint256 recieved;
+
+    if(_fromToken == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
+      recieved = convertPortal.convert.value(_amount)(_fromToken, _toToken, _amount);
+    }else{
+      recieved = convertPortal.convert(_fromToken, _toToken, _amount);
+    }
+    IERC20(_toToken).transfer(0x000000000000000000000000000000000000dEaD, recieved);
   }
 
+
+  // ONLY owner setters
   function setSplit(
     uint _cotSplit,
     uint _partnerSplit,
@@ -49,5 +95,9 @@ contract PlatformWallet is Ownable {
 
   function senConvertPortal(address _convertPortal) external {
     convertPortal = IConvertPortal(_convertPortal);
+  }
+
+  function senPartnerToken(address _partnerTokenAddress) external {
+    partnerTokenAddress = _partnerTokenAddress;
   }
 }
