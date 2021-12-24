@@ -119,6 +119,8 @@ contract('Strategy UNI/WETH', function([userOne, userTwo, userThree]) {
     pricePortal = await PricePortalUniswap.new(
       weth.address,
       uniswapV2Router.address,
+      uniswapV2Router.address,
+      token.address,
       uniswapV2Factory.address,
       [weth.address, token.address]
     )
@@ -129,6 +131,7 @@ contract('Strategy UNI/WETH', function([userOne, userTwo, userThree]) {
       oneInch.address,
       merkleWhiteList.address,
       weth.address,
+      uniswapV2Router.address,
       uniswapV2Router.address
     )
 
