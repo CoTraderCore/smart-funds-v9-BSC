@@ -1,4 +1,5 @@
 import "../uniswap/interfaces/IUniswapV2Router";
+import "../zeppelin-solidity/contracts/token/IERC20";
 
 contract ConvertPortal {
   IUniswapV2Router public router;
@@ -16,6 +17,7 @@ contract ConvertPortal {
   )
    external
    payable
+   returns(uint256)
   {
     // ETH case
     if(_from == 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE){
@@ -26,7 +28,7 @@ contract ConvertPortal {
       router.swapExactETHForTokens.value(_amount)(
         1,
         path,
-        msg.sender,
+        address(this),
         now + 15 minutes
       );
     }
@@ -42,13 +44,18 @@ contract ConvertPortal {
          _amount,
          1,
          path,
-         msg.sender,
+         address(this),
          now + 15 minutes
        );
     }
+
+    uint256 received = IERC20(_to).balanceOf(address(this));
+    IERC20(_to).transfer(msg.sender, received);
+
+    return received;
   }
 
-  function _transferFromSenderAndApproveTo(ERC20 _source, uint256 _sourceAmount, address _to) private {
+  function _transferFromSenderAndApproveTo(IERC20 _source, uint256 _sourceAmount, address _to) private {
     require(_source.transferFrom(msg.sender, address(this), _sourceAmount));
     _source.approve(_to, _sourceAmount);
   }
