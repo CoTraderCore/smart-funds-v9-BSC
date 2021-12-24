@@ -1,5 +1,5 @@
-import "../uniswap/interfaces/IUniswapV2Router";
-import "../zeppelin-solidity/contracts/token/IERC20";
+import "../uniswap/interfaces/IUniswapV2Router.sol";
+import "../zeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 contract ConvertPortal {
   IUniswapV2Router public router;
@@ -34,11 +34,11 @@ contract ConvertPortal {
     }
     // ERC20 case
     else {
-      address[] memory path = address[](2);
+      address[] memory path = new address[](2);
       path[0] = _from;
       path[1] = _to;
 
-      _transferFromSenderAndApproveTo(_from,  _amount, address(router));
+      _transferFromSenderAndApproveTo(IERC20(_from), _amount, address(router));
 
       router.swapExactTokensForTokens(
          _amount,
