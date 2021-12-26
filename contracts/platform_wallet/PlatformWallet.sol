@@ -16,8 +16,9 @@ contract PlatformWallet is Ownable {
   uint partnerSplit = 0;
   uint platformSplit = 50;
 
-  constructor(address _convertPortal) public {
+  constructor(address _convertPortal, address _COT) public {
     convertPortal = IConvertPortal(_convertPortal);
+    COT = _COT;
   }
 
   // destribute tokens
@@ -71,6 +72,7 @@ contract PlatformWallet is Ownable {
     if(_fromToken == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)){
       recieved = convertPortal.convert.value(_amount)(_fromToken, _toToken, _amount);
     }else{
+      IERC20(_fromToken).approve(address(convertPortal), _amount);
       recieved = convertPortal.convert(_fromToken, _toToken, _amount);
     }
     IERC20(_toToken).transfer(0x000000000000000000000000000000000000dEaD, recieved);
@@ -93,11 +95,13 @@ contract PlatformWallet is Ownable {
     platformSplit = _platformSplit;
   }
 
-  function senConvertPortal(address _convertPortal) external {
+  function senConvertPortal(address _convertPortal) external onlyOwner {
     convertPortal = IConvertPortal(_convertPortal);
   }
 
-  function senPartnerToken(address _partnerTokenAddress) external {
+  function senPartnerToken(address _partnerTokenAddress) external onlyOwner {
     partnerTokenAddress = _partnerTokenAddress;
   }
+
+  receive() external payable  {}
 }

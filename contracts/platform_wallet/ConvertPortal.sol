@@ -34,9 +34,10 @@ contract ConvertPortal {
     }
     // ERC20 case
     else {
-      address[] memory path = new address[](2);
+      address[] memory path = new address[](3);
       path[0] = _from;
-      path[1] = _to;
+      path[1] = WETH;
+      path[2] = _to;
 
       _transferFromSenderAndApproveTo(IERC20(_from), _amount, address(router));
 
