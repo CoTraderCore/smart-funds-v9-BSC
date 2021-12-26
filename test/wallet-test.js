@@ -44,7 +44,8 @@ let xxxERC,
     weth,
     token,
     convertPortal,
-    platformWallet
+    platformWallet,
+    partnerToken
 
 
 
@@ -66,6 +67,14 @@ contract('Strategy UNI/WETH', function([userOne, userTwo, userThree]) {
       "1000000000000000000000000"
     )
 
+
+    partnerToken = await Token.new(
+      "Partner",
+      "Partner",
+      18,
+      "1000000000000000000000000"
+    )
+
     // deploy DEX
     uniswapV2Factory = await UniswapV2Factory.new(userOne)
     weth = await WETH.new()
@@ -83,11 +92,21 @@ contract('Strategy UNI/WETH', function([userOne, userTwo, userThree]) {
       "1111111111111111111111"
     , { from:userOne, value:toWei(String(ethLD)) })
 
-    // add token liquidity
     await DAI.approve(uniswapV2Router.address, toWei(String(tokenLD)))
 
     await uniswapV2Router.addLiquidityETH(
       DAI.address,
+      toWei(String(tokenLD)),
+      1,
+      1,
+      userOne,
+      "1111111111111111111111"
+    , { from:userOne, value:toWei(String(ethLD)) })
+
+    await partnerToken.approve(uniswapV2Router.address, toWei(String(tokenLD)))
+
+    await uniswapV2Router.addLiquidityETH(
+      partnerToken.address,
       toWei(String(tokenLD)),
       1,
       1,
@@ -131,11 +150,67 @@ contract('Strategy UNI/WETH', function([userOne, userTwo, userThree]) {
       assert.notEqual(await web3.eth.getBalance(platformWallet.address), 0)
 
       assert.equal(await token.balanceOf(DEAD_ADDRESS), 0)
-      
+
       // destribute
       await platformWallet.destributionTokens([ETH_TOKEN_ADDRESS])
 
       assert.notEqual(await token.balanceOf(DEAD_ADDRESS), 0)
+    })
+
+    it('Destribute works with partner token ', async function() {
+      // set partner token
+      await platformWallet.setPartnerToken(partnerToken.address)
+      await platformWallet.setSplit(20, 20, 60)
+
+      assert.equal(await DAI.balanceOf(platformWallet.address), 0)
+      // send DAI to wallet
+      await DAI.transfer(platformWallet.address, await DAI.balanceOf(userOne))
+      assert.notEqual(await DAI.balanceOf(platformWallet.address), 0)
+
+      assert.equal(await token.balanceOf(DEAD_ADDRESS), 0)
+      assert.equal(await partnerToken.balanceOf(DEAD_ADDRESS), 0)
+
+      // destribute
+      await platformWallet.destributionTokens([DAI.address])
+
+      assert.notEqual(await token.balanceOf(DEAD_ADDRESS), 0)
+      assert.notEqual(await partnerToken.balanceOf(DEAD_ADDRESS), 0)
+    })
+  })
+
+  describe('Setters ', async function() {
+    it('Not owner can not set destribution percent ', async function() {
+      await platformWallet.setSplit(20, 20, 60, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can set destribution percent ', async function() {
+      await platformWallet.setSplit(20, 20, 60)
+
+      assert.equal(await platformWallet.cotSplit(), 20)
+      assert.equal(await platformWallet.partnerSplit(), 20)
+      assert.equal(await platformWallet.platformSplit(), 60)
+    })
+
+
+    it('Not owner can not set partner address ', async function() {
+      await platformWallet.setPartnerToken(partnerToken.address, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can set partner address ', async function() {
+      await platformWallet.setPartnerToken(partnerToken.address)
+      assert.equal(await platformWallet.partnerTokenAddress(), partnerToken.address)
+    })
+
+    it('Not owner can not set convert portal address ', async function() {
+      await platformWallet.setConvertPortal(DEAD_ADDRESS, { from:userTwo })
+      .should.be.rejectedWith(EVMRevert)
+    })
+
+    it('Owner can set convert portal address ', async function() {
+      await platformWallet.setConvertPortal(DEAD_ADDRESS)
+      assert.equal(await platformWallet.convertPortal(), DEAD_ADDRESS)
     })
   })
   //END

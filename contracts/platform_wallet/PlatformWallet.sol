@@ -12,9 +12,9 @@ contract PlatformWallet is Ownable {
   address public partnerTokenAddress;
   IConvertPortal public convertPortal;
 
-  uint cotSplit = 50;
-  uint partnerSplit = 0;
-  uint platformSplit = 50;
+  uint public cotSplit = 50;
+  uint public partnerSplit = 0;
+  uint public platformSplit = 50;
 
   constructor(address _convertPortal, address _COT) public {
     convertPortal = IConvertPortal(_convertPortal);
@@ -57,8 +57,7 @@ contract PlatformWallet is Ownable {
      }
   }
 
-  // helpers
-
+  // helper
   function convertAndBurn(
     address _fromToken,
     address _toToken,
@@ -95,11 +94,11 @@ contract PlatformWallet is Ownable {
     platformSplit = _platformSplit;
   }
 
-  function senConvertPortal(address _convertPortal) external onlyOwner {
+  function setConvertPortal(address _convertPortal) external onlyOwner {
     convertPortal = IConvertPortal(_convertPortal);
   }
 
-  function senPartnerToken(address _partnerTokenAddress) external onlyOwner {
+  function setPartnerToken(address _partnerTokenAddress) external onlyOwner {
     partnerTokenAddress = _partnerTokenAddress;
   }
 
