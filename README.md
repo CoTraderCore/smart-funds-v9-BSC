@@ -44,6 +44,10 @@ so frontend should support different version of portals
 
 optimization true 200
 
+bCOT
+
+0x304fC73e86601a61a6C6db5B0eAfEA587622acdC
+
 WETH
 
 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c
@@ -164,5 +168,15 @@ SmartFundRegistry
 MockExchangePortalPrice
 
 0xe81F3fF8c7D6F2E3f19A7872fD32D5EAC5491C91
+
+
+Wallet convert portal
+
+0xeefACC7d6e8aEb01698D894Cfc7a3BA8702C2Db4
+
+
+Platform wallet
+
+0x7A3a6ABF362e89f43eB5428847B445935683CDf8
 
 ```
