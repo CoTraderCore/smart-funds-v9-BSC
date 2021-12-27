@@ -83,7 +83,6 @@ contract UNIBuyLowSellHigh is KeeperCompatibleInterface, Ownable {
       uint256 oneUNIinUnderlying = getUNIPriceInUNDERLYING();
       uint256 LD = getLDAmount();
       return oneUNIinUnderlying.mul(1e18).div(LD.mul(2));
-      // return LD.mul(2).div(oneUNIinUnderlying);
     }
 
     // Helper for check price for 1 UNI in UNDERLYING
